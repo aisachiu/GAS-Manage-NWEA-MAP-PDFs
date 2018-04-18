@@ -19,11 +19,24 @@ function listPDFsStart() {
   // Process the user's response.
   var button = result.getSelectedButton();
   var text = result.getResponseText();
-  if ((button == ui.Button.OK) && (text !== "")) {
-    var myID = getIdFromUrl(text);
-    getMAPReportIDsAIS(myID);
+  var myID = getIdFromUrl(text)
+  if ((button == ui.Button.OK) && (myID)) {
+      var result2 = ui.prompt(
+      'How long are Student IDs?',
+      'Length of Student IDs:',
+      ui.ButtonSet.OK_CANCEL);
+    var button2 = result2.getSelectedButton();
+    var sid = parseInt(result2.getResponseText());
+    if (button2== ui.Button.OK){
+      if(!isNaN(sid)){
+        getMAPReportIDsAIS(myID, sid);
+      } else {
+        throw "Error - is Student ID length entered a number? Cancelled"
+      }
+    }
   }
 }
+
 // ------
 //
 // function getMAPReportIDs()
@@ -34,9 +47,8 @@ function listPDFsStart() {
 // The function will write the results onto a new sheet, with a link and the ID of the doc next to the student ID.
 //
 // ------
-function getMAPReportIDs(sourceFolderID) {
+function getMAPReportIDs(sourceFolderID, studentIdLength) {
   sourceFolderID = sourceFolderID ? sourceFolderID : sfID ;
-  var studentIdLength = 6;
   
   var mySs = SpreadsheetApp.getActive();
   var mySourceFolder = DriveApp.getFolderById(sourceFolderID);
@@ -65,9 +77,9 @@ function getMAPReportIDs(sourceFolderID) {
 // AIS version has some changes to the columns - inserting student and parent ID
 //
 // ------
-function getMAPReportIDsAIS(sourceFolderID) {
+function getMAPReportIDsAIS(sourceFolderID, studentIdLength) {
   sourceFolderID = sourceFolderID ? sourceFolderID : sfID ;
-  var studentIdLength = 6;
+//  var studentIdLength = 6;
   
   var mySs = SpreadsheetApp.getActive();
   var emailDir = mySs.getSheetByName("Master Ss List").getDataRange().getValues();
