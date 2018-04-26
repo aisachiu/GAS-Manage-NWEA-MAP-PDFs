@@ -1,7 +1,5 @@
 var sfID = '1K_awhmCHICpW3UWbSnOMdW6ZbIoh2QNK'
-var studentEmailListSheetName = "Master Email List"
 
-// function onOpen() - creates the menu item "Map Reports" in the spreadsheet
 function onOpen() {
   SpreadsheetApp.getUi() // Or DocumentApp or FormApp.
       .createMenu('MAP Reports')
@@ -10,7 +8,6 @@ function onOpen() {
       .addToUi();
 }
 
-// function listPDFsStart() - Creates a list of all the PDF files within a given Google folder
 function listPDFsStart() {
   var ui = SpreadsheetApp.getUi(); // Same variations.
 
@@ -24,7 +21,7 @@ function listPDFsStart() {
   var text = result.getResponseText();
   if ((button == ui.Button.OK) && (text !== "")) {
     var myID = getIdFromUrl(text);
-    getMAPReportIDsAIS(myID); //Use the AIS version
+    getMAPReportIDsAIS(myID);
   }
 }
 // ------
@@ -73,7 +70,7 @@ function getMAPReportIDsAIS(sourceFolderID) {
   var studentIdLength = 6;
   
   var mySs = SpreadsheetApp.getActive();
-  var emailDir = mySs.getSheetByName(studentEmailListSheetName).getDataRange().getValues();
+  var emailDir = mySs.getSheetByName("Master Ss List").getDataRange().getValues();
   var myPEmailCol = -1;
   var mySNumberCol = -1
   for (var x = 0; x < emailDir[0].length; x++){
