@@ -1,5 +1,12 @@
+var thisUser = Session.getActiveUser().getEmail();
+var masterListURL = SpreadsheetApp.getActiveSpreadsheet().getUrl();//Sets this Spreadsheet's URL.
+var masterSheetName = "Sheet 1";
+var myDefaultLink = "http://www.google.com";
+var appTitle = "Your Links";
 var sfID = '1K_awhmCHICpW3UWbSnOMdW6ZbIoh2QNK'
+var studentEmailListSheetName = "Master Email List"
 
+// function onOpen() - creates the menu item "Map Reports" in the spreadsheet
 function onOpen() {
   SpreadsheetApp.getUi() // Or DocumentApp or FormApp.
       .createMenu('MAP Reports')
@@ -8,6 +15,7 @@ function onOpen() {
       .addToUi();
 }
 
+// function listPDFsStart() - Creates a list of all the PDF files within a given Google folder
 function listPDFsStart() {
   var ui = SpreadsheetApp.getUi(); // Same variations.
 
@@ -21,7 +29,7 @@ function listPDFsStart() {
   var text = result.getResponseText();
   if ((button == ui.Button.OK) && (text !== "")) {
     var myID = getIdFromUrl(text);
-    getMAPReportIDsAIS(myID);
+    getMAPReportIDsAIS(myID); //Use the AIS version
   }
 }
 // ------
@@ -70,7 +78,7 @@ function getMAPReportIDsAIS(sourceFolderID) {
   var studentIdLength = 6;
   
   var mySs = SpreadsheetApp.getActive();
-  var emailDir = mySs.getSheetByName("Master Ss List").getDataRange().getValues();
+  var emailDir = mySs.getSheetByName(studentEmailListSheetName).getDataRange().getValues();
   var myPEmailCol = -1;
   var mySNumberCol = -1
   for (var x = 0; x < emailDir[0].length; x++){
@@ -176,3 +184,40 @@ function validateEmail(email) {
 }
 
 function getIdFromUrl(url) { return url.match(/[-\w]{25,}/); }
+
+
+function setDefaults() {
+  var mySs = SpreadsheetApp.openByUrl(masterListURL);
+  var mySettings = mySs.getSheetByName("Settings").getDataRange().getValues();
+  myDefaultLink = mySettings[1][1]; // get default link from settings sheet
+  masterSheetName = mySettings[2][1]; // get sheet name from settings sheet
+ // appTitle = (typeof mySettings[3][1] !== 'undefined' && mySettings[3][1] > 0) ? mySettings[3][1] : appTitle;
+  
+}
+
+// doGet() - Serves the HTML landing page.
+function doGet() {
+  var myDoc = 'landing';  
+  return HtmlService.createTemplateFromFile(myDoc).evaluate().setSandboxMode(HtmlService.SandboxMode.IFRAME);
+}
+
+// ----
+// getMyLinks() - Called by the landing.html file on load.
+//                This goes through the spreadsheet and seeks any rows that contain the logged-in user's email in column 1 and 2.
+//                It returns an array containing the link and the title to the link.
+// ----
+function getMyLinks(){
+  setDefaults();
+  var mySs = SpreadsheetApp.openByUrl(masterListURL).getSheetByName(masterSheetName);
+  var myData = mySs.getDataRange().getValues(); //Get the data in the spreadsheet
+  var found = false;
+  var myLink = []; //create a blank array to save all found data.
+  for (var i=1; i < myData.length; i++){ //for each row
+    if ((myData[i][0] == thisUser)||(myData[i][1] == thisUser)){ //if the logged in user email matches col 1 or col 2
+      myLink.push([myData[i][2], myData[i][3]]); //add the link and title to the array
+      found = true; //indicates that we found a link
+    }
+  }
+  if (!found) myLink.push([myDefaultLink, "Sorry, no links found for this user "+ thisUser]); //Provide a message in form of link if no links found.
+  return myLink;
+}
