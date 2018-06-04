@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <link rel="stylesheet" type="text/css" href="https://www.ais.edu.hk/wp-content/themes/blu/assets/css/style_dynamic.css?ver=1516771005" />
+    <link rel="stylesheet" type="text/css" href="https://www.ais.edu.hk/wp-content/themes/blu/assets/css/modules-responsive.min.css?ver=4.9.5" />
+  </head>
+  
+  <script>
+    google.script.run.withSuccessHandler(showData).getMyLinks();
+    
+    function redirectMeTo(url){
+      if(url){
+        window.top.location.href = url;
+      }
+        
+    }
+    
+    function showData(links){
+      var myHTML = "<ul>";
+      for(var i=0; i < links.length; i++){
+        myHTML += '<li><a href="'+links[i][0]+'">'+links[i][1]+'</a></li>';
+      }
+      myHTML +='</ul>'
+      document.getElementById('mainlinks').innerHTML = myHTML;
+    }
+  </script>
+  <body>
+    <h1> <?= appTitle ?> </h1>
+    <div id="mainlinks">
+    </div>
+  </body>
+</html>
+
+
+
